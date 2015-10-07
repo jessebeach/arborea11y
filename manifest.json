@@ -1,0 +1,32 @@
+{
+  "name": "Arborea11y",
+  "version": "0.0.1",
+  "description": "Retrieves a document's AX Tree.",
+  "background": {
+    "scripts": [
+      "lib/DocFragUtils.js",
+      "lib/AXTreeBuilder.js",
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "all_frames": true,
+      "js": [
+        "lib/DocFragUtils.js",
+        "content.js"
+      ]
+    }
+  ],
+  "browser_action": {},
+  "permissions": [
+    "<all_urls>",
+    "tabs"
+  ],
+  "automation": true,
+  "manifest_version": 2
+}
