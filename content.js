@@ -11,30 +11,19 @@ const ACTION_REMOVE = 'remove';
 const ARBOREA11Y_CONTAINER_ID = 'arborea11y-container';
 
 function onExtensionMessage(response) {
-  switch (response.source) {
-    case SOURCE_POPUP:
-      switch (response.action) {
-        case ACTION_APPEND:
-          requestAXTreeInjection();
+  switch (response.action) {
+    case ACTION_APPEND:
+      switch (response.source) {
+        case SOURCE_POPUP:
+          requestGenAXTree();
           break;
-        case ACTION_REMOVE:
-          removeAXTree();
+        case SOURCE_BACKGROUND:
+          appendAXTree(response.axtree);
           break;
       }
       break;
-    case SOURCE_BACKGROUND:
-      if (response.axtree) {
-        switch (response.action) {
-          case ACTION_APPEND:
-            let axTreeFrag = DocFragUtils.deserialize(response.axtree);
-            let axContainer = document.createElement('div');
-            axContainer.setAttribute('id', ARBOREA11Y_CONTAINER_ID);
-            axContainer.setAttribute('style', 'outline: 1px solid red; outline-offset: -1px; padding: 10px; margin: 10px 0;');
-            axContainer.appendChild(axTreeFrag);
-            document.body.appendChild(axContainer);
-            break;
-        }
-      }
+    case ACTION_REMOVE:
+      removeAXTree();
       break;
   }
 }
@@ -53,7 +42,7 @@ function onPageMessage(event) {
   ) {
     switch (data.action) {
       case ACTION_APPEND:
-        requestAXTreeInjection();
+        requestGenAXTree();
         break;
       case ACTION_REMOVE:
         removeAXTree();
@@ -62,18 +51,18 @@ function onPageMessage(event) {
   }
 }
 
-function requestAXTreeInjection() {
+function requestGenAXTree() {
   if (document.readyState === COMPLETE) {
-    injectAXTree();
+    genAXTree();
   } else {
     document.addEventListener('DOMContentLoaded', function() {
-      injectAXTree();
-      document.removeEventListener(injectAXTree);
+      genAXTree();
+      document.removeEventListener(genAXTree);
     });
   }
 }
 
-function injectAXTree() {
+function genAXTree() {
   const message = {
     action: ACTION_APPEND,
     source: SOURCE_CONTENT
@@ -89,6 +78,19 @@ function injectAXTree() {
       }, 0);
     }
   );
+}
+
+function appendAXTree(axTree) {
+  if (!axTree) {
+    throw new Error('No AXTree provided for appending.');
+    return;
+  }
+  let axTreeFrag = DocFragUtils.deserialize(axTree);
+  let axContainer = document.createElement('div');
+  axContainer.setAttribute('id', ARBOREA11Y_CONTAINER_ID);
+  axContainer.setAttribute('style', 'outline: 1px solid red; outline-offset: -1px; padding: 10px; margin: 10px 0;');
+  axContainer.appendChild(axTreeFrag);
+  document.body.appendChild(axContainer);
 }
 
 function removeAXTree() {

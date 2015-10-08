@@ -1,20 +1,38 @@
 "use strict";
 
 document.addEventListener('DOMContentLoaded', function () {
-  var button = document.getElementById('loadAXTreeButton');
-  button.addEventListener('click', function () {
-    let button = event.target;
-    Tabs.getCurrent().then(
-      // Success.
-      function(tabInfo) {
-        chrome.runtime.sendMessage(
-          {
-            source: 'popup',
-            action: 'append',
-            tabId: tabInfo.id
+  document
+    .getElementById('loadAXTreeButton')
+    .addEventListener('click', function () {
+      let button = event.target;
+      Tabs.getCurrent().then(
+        // Success.
+        function(tabInfo) {
+          chrome.runtime.sendMessage(
+            {
+              source: 'popup',
+              action: 'append',
+              tabId: tabInfo.id
+            }
+          );
+        }
+      );
+    }, false);
+    document
+      .getElementById('removeAXTreeButton')
+      .addEventListener('click', function () {
+        let button = event.target;
+        Tabs.getCurrent().then(
+          // Success.
+          function(tabInfo) {
+            chrome.runtime.sendMessage(
+              {
+                source: 'popup',
+                action: 'remove',
+                tabId: tabInfo.id
+              }
+            );
           }
         );
-      }
-    );
-  }, false);
+      }, false);
 });
