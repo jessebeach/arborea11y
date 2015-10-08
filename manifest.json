@@ -4,6 +4,7 @@
   "description": "Retrieves a document's AX Tree.",
   "background": {
     "scripts": [
+      "constants.js",
       "lib/DocFragUtils.js",
       "lib/Tabs.js",
       "lib/AXTreeBuilder.js",
@@ -18,6 +19,7 @@
       ],
       "all_frames": true,
       "js": [
+        "constants.js",
         "lib/DocFragUtils.js",
         "lib/Tabs.js",
         "content.js"

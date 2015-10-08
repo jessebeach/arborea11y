@@ -1,7 +1,5 @@
 'use strict';
 
-const COMPLETE = 'complete';
-
 function buildAXTree(tabId) {
   return new Promise(function(resolve, reject) {
     if (tabId) {
@@ -26,18 +24,18 @@ chrome.runtime.onMessage.addListener(
     let id = request.tabId || (sender.tab && sender.tab.id);
     if (id) {
       switch (request.source) {
-        case 'popup':
+        case SOURCE_POPUP:
           Tabs.sendTo(id, {
-            source: 'popup',
+            source: SOURCE_POPUP,
             action: request.action
           });
           break;
-        case 'content':
+        case SOURCE_CONTENT:
           buildAXTree(id).then(
             // Success
             function(data) {
               data.action = request.action;
-              data.source = 'background';
+              data.source = SOURCE_BACKGROUND;
               Tabs.sendTo(id, data);
             }
           );

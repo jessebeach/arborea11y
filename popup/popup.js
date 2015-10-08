@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
         function(tabInfo) {
           chrome.runtime.sendMessage(
             {
-              source: 'popup',
-              action: 'append',
+              source: SOURCE_POPUP,
+              action: ACTION_APPEND,
               tabId: tabInfo.id
             }
           );
@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
           function(tabInfo) {
             chrome.runtime.sendMessage(
               {
-                source: 'popup',
-                action: 'remove',
+                source: SOURCE_POPUP,
+                action: ACTION_REMOVE,
                 tabId: tabInfo.id
               }
             );

@@ -42,7 +42,7 @@ function onPageMessage(event) {
 }
 
 function requestGenAXTree() {
-  if (document.readyState === COMPLETE) {
+  if (document.readyState === READY_STATE_COMPLETE) {
     genAXTree();
   } else {
     document.addEventListener('DOMContentLoaded', function() {
