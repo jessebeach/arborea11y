@@ -21,28 +21,17 @@ function buildAXTree(tabId) {
   });
 }
 
-let onUpdatedTabHandler = function(tabId, processInfo, tabInfo) {
-  if (processInfo.status === COMPLETE) {
-    chrome.runtime.sendMessage(
-      {
-        action: 'replace',
-        tabId: tabInfo.id
-      }
-    );
-    chrome.tabs.onUpdated.removeListener(onUpdatedTabHandler);
-  }
-};
-
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     switch (request.action) {
-      case 'replace':
+      case 'append':
         let id = request.tabId || (sender.tab && sender.tab.id);
         if (id) {
           buildAXTree(id).then(
             // Success
-            function(fragStr) {
-              Tabs.sendTo(id, fragStr);
+            function(data) {
+              data.action = request.action;
+              Tabs.sendTo(id, data);
             }
           );
         }
@@ -50,5 +39,3 @@ chrome.runtime.onMessage.addListener(
     }
   }
 );
-
-// chrome.tabs.onUpdated.addListener(onUpdatedTabHandler);
