@@ -1,18 +1,24 @@
 "use strict";
 
+const EXT_NAME = 'arborea11y';
 const COMPLETE = 'complete';
-const PAGE_MESSAGE = 'pageMessage';
+const SOURCE_PAGE = 'page';
+const SOURCE_CONTENT = 'content';
+const SOURCE_BACKGROUND = 'background';
+const SOURCE_POPUP = 'popup';
+const ACTION_APPEND = 'append';
+const ACTION_REMOVE = 'remove';
 const ARBOREA11Y_CONTAINER_ID = 'arborea11y-container';
 
 function onExtensionMessage(response) {
   switch (response.source) {
-    case 'popup':
+    case SOURCE_POPUP:
       requestAXTreeInjection();
       break;
-    case 'background':
+    case SOURCE_BACKGROUND:
       if (response.axtree) {
         switch (response.action) {
-          case 'append':
+          case ACTION_APPEND:
             let axTreeFrag = DocFragUtils.deserialize(response.axtree);
             let axContainer = document.createElement('div');
             axContainer.setAttribute('id', ARBOREA11Y_CONTAINER_ID);
@@ -32,8 +38,17 @@ function onPageMessage(event) {
     return;
   }
 
-  if (event.data.type && (event.data.type == PAGE_MESSAGE)) {
-    injectAXTree();
+  let data = event.data || {};
+
+  if (
+    data.extension === EXT_NAME &&
+    data.source === SOURCE_PAGE
+  ) {
+    switch (data.action) {
+      case ACTION_APPEND:
+        requestAXTreeInjection();
+        break;
+    }
   }
 }
 
@@ -50,8 +65,8 @@ function requestAXTreeInjection() {
 
 function injectAXTree() {
   const message = {
-    action: 'append',
-    source: 'content'
+    action: ACTION_APPEND,
+    source: SOURCE_CONTENT
   };
   // Clean up any AX info in the DOM.
   let axContainer = document.getElementById(ARBOREA11Y_CONTAINER_ID);
