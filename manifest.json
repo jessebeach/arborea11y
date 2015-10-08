@@ -19,6 +19,7 @@
       "all_frames": true,
       "js": [
         "lib/DocFragUtils.js",
+        "lib/Tabs.js",
         "content.js"
       ]
     }

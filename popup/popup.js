@@ -1,3 +1,5 @@
+"use strict";
+
 document.addEventListener('DOMContentLoaded', function () {
   var button = document.getElementById('loadAXTreeButton');
   button.addEventListener('click', function () {
@@ -6,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
       chrome.runtime.sendMessage(
         {
           action: 'replace',
-          tabInfo: tabInfo
+          tabId: tabInfo.id
         }
       );
     });
