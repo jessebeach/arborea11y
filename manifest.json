@@ -5,6 +5,7 @@
   "background": {
     "scripts": [
       "lib/DocFragUtils.js",
+      "lib/Tabs.js",
       "lib/AXTreeBuilder.js",
       "background.js"
     ],
@@ -22,11 +23,14 @@
       ]
     }
   ],
-  "browser_action": {},
+  "browser_action": {
+    "default_popup": "popup/popup.html"
+  },
   "permissions": [
     "<all_urls>",
     "tabs"
   ],
   "automation": true,
-  "manifest_version": 2
+  "manifest_version": 2,
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }
