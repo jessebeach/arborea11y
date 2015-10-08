@@ -4,16 +4,20 @@ const COMPLETE = 'complete';
 
 function buildAXTree(tabId) {
   return new Promise(function(resolve, reject) {
-    chrome.automation.getTree(tabId, function(rootNode) {
-      if (!rootNode) {
-        reject('No rootNode returned from chrome.automation.getTree');
-        return;
-      }
-      let tree = AXTreeBuilder.createTree(rootNode);
-      resolve({
-        axtree: DocFragUtils.serialize(tree)
+    if (tabId) {
+      chrome.automation.getTree(tabId, function(rootNode) {
+        if (!rootNode) {
+          reject('No rootNode returned from chrome.automation.getTree for the Tab with ID ' + tabId);
+          return;
+        }
+        let tree = AXTreeBuilder.createTree(rootNode);
+        resolve({
+          axtree: DocFragUtils.serialize(tree)
+        });
       });
-    });
+    } else {
+      reject('No tabId provided.');
+    }
   });
 }
 
