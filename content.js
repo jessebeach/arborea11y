@@ -5,17 +5,24 @@ const PAGE_MESSAGE = 'pageMessage';
 const ARBOREA11Y_CONTAINER_ID = 'arborea11y-container';
 
 function onExtensionMessage(response) {
-  if (response.axtree) {
-    switch (response.action) {
-      case 'append':
-        let axTreeFrag = DocFragUtils.deserialize(response.axtree);
-        let axContainer = document.createElement('div');
-        axContainer.setAttribute('id', ARBOREA11Y_CONTAINER_ID);
-        axContainer.setAttribute('style', 'outline: 1px solid red; outline-offset: -1px; padding: 10px; margin: 10px 0;');
-        axContainer.appendChild(axTreeFrag);
-        document.body.appendChild(axContainer);
-        break;
-    }
+  switch (response.source) {
+    case 'popup':
+      requestAXTreeInjection();
+      break;
+    case 'background':
+      if (response.axtree) {
+        switch (response.action) {
+          case 'append':
+            let axTreeFrag = DocFragUtils.deserialize(response.axtree);
+            let axContainer = document.createElement('div');
+            axContainer.setAttribute('id', ARBOREA11Y_CONTAINER_ID);
+            axContainer.setAttribute('style', 'outline: 1px solid red; outline-offset: -1px; padding: 10px; margin: 10px 0;');
+            axContainer.appendChild(axTreeFrag);
+            document.body.appendChild(axContainer);
+            break;
+        }
+      }
+      break;
   }
 }
 
@@ -42,6 +49,10 @@ function requestAXTreeInjection() {
 }
 
 function injectAXTree() {
+  const message = {
+    action: 'append',
+    source: 'content'
+  };
   // Clean up any AX info in the DOM.
   let axContainer = document.getElementById(ARBOREA11Y_CONTAINER_ID);
   if (axContainer) {
@@ -53,9 +64,7 @@ function injectAXTree() {
             // Wait for the DOM to really get itself freshened up.
             window.setTimeout(function() {
               // Rebuild the tree.
-              chrome.runtime.sendMessage({
-                action: 'append'
-              });
+              chrome.runtime.sendMessage(message);
             }, 0);
             observer.disconnect();
             break;
@@ -72,9 +81,7 @@ function injectAXTree() {
     document.body.removeChild(axContainer);
   } else {
     // Rebuild the tree.
-    chrome.runtime.sendMessage({
-      action: 'append'
-    });
+    chrome.runtime.sendMessage(message);
   }
 }
 // Embedded page messages.

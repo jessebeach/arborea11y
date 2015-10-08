@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
       function(tabInfo) {
         chrome.runtime.sendMessage(
           {
-            action: 'replace',
+            source: 'popup',
             tabId: tabInfo.id
           }
         );

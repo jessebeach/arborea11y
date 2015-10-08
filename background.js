@@ -23,19 +23,25 @@ function buildAXTree(tabId) {
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    switch (request.action) {
-      case 'append':
-        let id = request.tabId || (sender.tab && sender.tab.id);
-        if (id) {
+    let id = request.tabId || (sender.tab && sender.tab.id);
+    if (id) {
+      switch (request.source) {
+        case 'popup':
+          Tabs.sendTo(id, {
+            source: 'popup'
+          });
+          break;
+        case 'content':
           buildAXTree(id).then(
             // Success
             function(data) {
               data.action = request.action;
+              data.source = 'background';
               Tabs.sendTo(id, data);
             }
           );
-        }
-        break;
+          break;
+      }
     }
   }
 );
