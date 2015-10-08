@@ -1,14 +1,4 @@
-"use strict";
-
-const EXT_NAME = 'arborea11y';
-const COMPLETE = 'complete';
-const SOURCE_PAGE = 'page';
-const SOURCE_CONTENT = 'content';
-const SOURCE_BACKGROUND = 'background';
-const SOURCE_POPUP = 'popup';
-const ACTION_APPEND = 'append';
-const ACTION_REMOVE = 'remove';
-const ARBOREA11Y_CONTAINER_ID = 'arborea11y-container';
+'use strict';
 
 function onExtensionMessage(response) {
   switch (response.action) {
