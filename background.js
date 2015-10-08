@@ -28,7 +28,8 @@ chrome.runtime.onMessage.addListener(
       switch (request.source) {
         case 'popup':
           Tabs.sendTo(id, {
-            source: 'popup'
+            source: 'popup',
+            action: request.action
           });
           break;
         case 'content':

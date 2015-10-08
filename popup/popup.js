@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.runtime.sendMessage(
           {
             source: 'popup',
+            action: 'append',
             tabId: tabInfo.id
           }
         );

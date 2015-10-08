@@ -13,7 +13,14 @@ const ARBOREA11Y_CONTAINER_ID = 'arborea11y-container';
 function onExtensionMessage(response) {
   switch (response.source) {
     case SOURCE_POPUP:
-      requestAXTreeInjection();
+      switch (response.action) {
+        case ACTION_APPEND:
+          requestAXTreeInjection();
+          break;
+        case ACTION_REMOVE:
+          removeAXTree();
+          break;
+      }
       break;
     case SOURCE_BACKGROUND:
       if (response.axtree) {
@@ -48,6 +55,9 @@ function onPageMessage(event) {
       case ACTION_APPEND:
         requestAXTreeInjection();
         break;
+      case ACTION_REMOVE:
+        removeAXTree();
+        break;
     }
   }
 }
@@ -69,35 +79,46 @@ function injectAXTree() {
     source: SOURCE_CONTENT
   };
   // Clean up any AX info in the DOM.
-  let axContainer = document.getElementById(ARBOREA11Y_CONTAINER_ID);
-  if (axContainer) {
-    // Wait for mutations to complete.
-    let observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        for (let node of Array.prototype.slice.call(mutation.removedNodes)) {
-          if (node === axContainer) {
-            // Wait for the DOM to really get itself freshened up.
-            window.setTimeout(function() {
-              // Rebuild the tree.
-              chrome.runtime.sendMessage(message);
-            }, 0);
-            observer.disconnect();
-            break;
+  removeAXTree().then(
+    // Success.
+    function() {
+      // Wait for the DOM to really get itself freshened up.
+      window.setTimeout(function() {
+        // Rebuild the tree.
+        chrome.runtime.sendMessage(message);
+      }, 0);
+    }
+  );
+}
+
+function removeAXTree() {
+  return new Promise(function(resolve, reject) {
+    let axContainer = document.getElementById(ARBOREA11Y_CONTAINER_ID);
+    if (axContainer) {
+      // Wait for mutations to complete.
+      let observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          for (let node of Array.prototype.slice.call(mutation.removedNodes)) {
+            if (node === axContainer) {
+              resolve(node);
+              observer.disconnect();
+              break;
+            }
           }
-        }
+        });
       });
-    });
-    let config = {
-      attributes: false,
-      childList: true,
-      characterData: false
-    };
-    observer.observe(document.body, config);
-    document.body.removeChild(axContainer);
-  } else {
-    // Rebuild the tree.
-    chrome.runtime.sendMessage(message);
-  }
+      let config = {
+        attributes: false,
+        childList: true,
+        characterData: false
+      };
+      observer.observe(document.body, config);
+      document.body.removeChild(axContainer);
+    }
+    else {
+      resolve();
+    }
+  });
 }
 // Embedded page messages.
 window.addEventListener("message", onPageMessage, false);
