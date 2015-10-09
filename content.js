@@ -5,7 +5,7 @@ function onExtensionMessage(response) {
     case ACTION_APPEND:
       switch (response.source) {
         case SOURCE_POPUP:
-          requestGenAXTree();
+          requestGenAXTree(response.action);
           break;
         case SOURCE_BACKGROUND:
           appendAXTree(response.axtree);
@@ -14,6 +14,9 @@ function onExtensionMessage(response) {
       break;
     case ACTION_REMOVE:
       removeAXTree();
+      break;
+    case ACTION_MESSAGE:
+      messageAXTree(response.axtree);
       break;
   }
 }
@@ -32,7 +35,8 @@ function onPageMessage(event) {
   ) {
     switch (data.action) {
       case ACTION_APPEND:
-        requestGenAXTree();
+      case ACTION_MESSAGE:
+        requestGenAXTree(data.action);
         break;
       case ACTION_REMOVE:
         removeAXTree();
@@ -41,20 +45,20 @@ function onPageMessage(event) {
   }
 }
 
-function requestGenAXTree() {
+function requestGenAXTree(action) {
   if (document.readyState === READY_STATE_COMPLETE) {
-    genAXTree();
+    genAXTree(action);
   } else {
     document.addEventListener('DOMContentLoaded', function() {
-      genAXTree();
+      genAXTree(action);
       document.removeEventListener(genAXTree);
     });
   }
 }
 
-function genAXTree() {
+function genAXTree(action) {
   const message = {
-    action: ACTION_APPEND,
+    action: action,
     source: SOURCE_CONTENT
   };
   // Clean up any AX info in the DOM.
@@ -111,6 +115,15 @@ function removeAXTree() {
       resolve();
     }
   });
+}
+
+function messageAXTree(axTree) {
+  window.postMessage({
+    extension: EXT_NAME,
+    source: SOURCE_EXT,
+    action: 'message',
+    axtree: axTree
+  }, '*');
 }
 // Embedded page messages.
 window.addEventListener("message", onPageMessage, false);
