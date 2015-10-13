@@ -8,7 +8,7 @@ function buildAXTree(tabId) {
           reject('No rootNode returned from chrome.automation.getTree for the Tab with ID ' + tabId);
           return;
         }
-        let tree = AXTreeBuilder.createTree(rootNode);
+        let tree = (new AXTree(rootNode)).tree;
         resolve({
           axtree: DocFragUtils.serialize(tree)
         });
