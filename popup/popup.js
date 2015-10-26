@@ -3,7 +3,7 @@
 function attachEventListeners () {
   [
     {
-      event: 'loadAXTreeButton',
+      event: 'appendAXTreeButton',
       action: ACTION_APPEND,
     },
     {
