@@ -3,6 +3,10 @@
 function attachEventListeners () {
   [
     {
+      event: 'popOutAXTreeButton',
+      action: ACTION_POPOUT,
+    },
+    {
       event: 'appendAXTreeButton',
       action: ACTION_APPEND,
     },

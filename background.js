@@ -25,10 +25,17 @@ chrome.runtime.onMessage.addListener(
     if (id) {
       switch (request.source) {
         case SOURCE_POPUP:
-          Tabs.sendTo(id, {
-            source: SOURCE_POPUP,
-            action: request.action
-          });
+          switch (request.action) {
+            case ACTION_APPEND:
+            case ACTION_REMOVE:
+              Tabs.sendTo(id, {
+                source: SOURCE_POPUP,
+                action: request.action
+              });
+              break;
+            case ACTION_POPOUT:
+              break;
+          }
           break;
         case SOURCE_CONTENT:
           buildAXTree(id).then(
