@@ -19,6 +19,38 @@ function buildAXTree(tabId) {
   });
 }
 
+function launchTreeView(data) {
+  function updateExplorer(tabInfo) {
+    let win = chrome.extension.getViews({
+      type: 'tab',
+      windowId: tabInfo.windowId
+    })[0];
+    if (win && win.appendTree) {
+      win.appendTree(
+        DocFragUtils.deserialize(data.axtree)
+      );
+    }
+  }
+
+  function onUpdatedWindowHandler(tabId, processInfo, tabInfo) {
+    if (processInfo.status === COMPLETE) {
+      updateExplorer(tabInfo);
+      chrome.tabs.onUpdated.removeListener(onUpdatedWindowHandler);
+    }
+  };
+
+  chrome.windows.create({
+    url: chrome.extension.getURL('view/explorer.html')
+  }, function(winInfo) {
+    let tabInfo = winInfo.tabs[0];
+    if (tabInfo && tabInfo.status === COMPLETE) {
+      updateExplorer(tabInfo);
+    } else {
+      chrome.tabs.onUpdated.addListener(onUpdatedWindowHandler);
+    }
+  });
+}
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     let id = request.tabId || (sender.tab && sender.tab.id);
@@ -34,6 +66,7 @@ chrome.runtime.onMessage.addListener(
               });
               break;
             case ACTION_POPOUT:
+              buildAXTree(id).then(launchTreeView);
               break;
           }
           break;
