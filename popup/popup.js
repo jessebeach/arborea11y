@@ -1,25 +1,18 @@
 'use strict';
 
-document.addEventListener('DOMContentLoaded', function () {
-  document
-    .getElementById('loadAXTreeButton')
-    .addEventListener('click', function () {
-      let button = event.target;
-      Tabs.getCurrent().then(
-        // Success.
-        function(tabInfo) {
-          chrome.runtime.sendMessage(
-            {
-              source: SOURCE_POPUP,
-              action: ACTION_APPEND,
-              tabId: tabInfo.id
-            }
-          );
-        }
-      );
-    }, false);
+function attachEventListeners () {
+  [
+    {
+      event: 'loadAXTreeButton',
+      action: ACTION_APPEND,
+    },
+    {
+      event: 'removeAXTreeButton',
+      action: ACTION_REMOVE,
+    }
+  ].forEach(function (mapping) {
     document
-      .getElementById('removeAXTreeButton')
+      .getElementById(mapping.event)
       .addEventListener('click', function () {
         let button = event.target;
         Tabs.getCurrent().then(
@@ -28,11 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
             chrome.runtime.sendMessage(
               {
                 source: SOURCE_POPUP,
-                action: ACTION_REMOVE,
+                action: mapping.action,
                 tabId: tabInfo.id
               }
             );
           }
         );
       }, false);
-});
+  });
+}
+
+document.addEventListener('DOMContentLoaded', attachEventListeners);
